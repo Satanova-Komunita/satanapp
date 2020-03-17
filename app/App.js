@@ -57,7 +57,11 @@ export default function App(props) {
                 height: 0
               }
             }} />
-            <Stack.Screen name='Home' component={HomeScreen} />
+            <Stack.Screen name='Home' component={HomeScreen} options={{
+              headerStyle: {
+                height: 0
+              }
+            }} />
           </Stack.Navigator>
         </NavigationContainer>
       </View>
