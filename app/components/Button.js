@@ -18,12 +18,12 @@ const StyledText = styled.Text`
   font-weight: bold;
 `
 
-export const Button = (props) => {
+export const Button = ({label, ...props}) => {
   return (
     <StyledTouchableOpacity
       {...props}
     >
-      <StyledText>{props.label}</StyledText>
+      <StyledText>{label}</StyledText>
     </StyledTouchableOpacity>
   )
 }
