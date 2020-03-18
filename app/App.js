@@ -1,81 +1,43 @@
 import 'react-native-gesture-handler'
-import * as React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { SplashScreen } from 'expo';
-import * as Font from 'expo-font';
-import { Ionicons } from '@expo/vector-icons';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import * as React from 'react'
+import styled from 'styled-components'
+import {NavigationContainer} from '@react-navigation/native'
+import {createStackNavigator} from '@react-navigation/stack'
 import {ThemeProvider} from 'styled-components'
 import LoginScreen from './screens/LoginScreen'
 import HomeScreen from './screens/HomeScreen'
+import VoteCandidateScreen from './screens/VoteCandidateScreen'
+import VoteSabatProposalScreen from './screens/VoteSabatProposalScreen'
 import {theme} from './theme'
+import {SCREENS} from './constants'
 
-import useLinking from './navigation/useLinking';
+const Stack = createStackNavigator()
 
-const Stack = createStackNavigator();
+const Body = styled.View`
+  flex: 1
+`
 
-export default function App(props) {
-  const [isLoadingComplete, setLoadingComplete] = React.useState(false);
-  const [initialNavigationState, setInitialNavigationState] = React.useState();
-  const containerRef = React.useRef();
-  const { getInitialState } = useLinking(containerRef);
-
-  // Load any resources or data that we need prior to rendering the app
-  React.useEffect(() => {
-    async function loadResourcesAndDataAsync() {
-      try {
-        SplashScreen.preventAutoHide();
-
-        // Load our initial navigation state
-        setInitialNavigationState(await getInitialState());
-
-        // Load fonts
-        await Font.loadAsync({
-          ...Ionicons.font,
-          'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
-        });
-      } catch (e) {
-        // We might want to provide this error information to an error reporting service
-        console.warn(e);
-      } finally {
-        setLoadingComplete(true);
-        SplashScreen.hide();
-      }
-    }
-
-    loadResourcesAndDataAsync();
-  }, []);
-
-  if (!isLoadingComplete && !props.skipLoadingScreen) {
-    return null;
-  } else {
-    return (
-      <ThemeProvider theme={theme}>
-        <View style={styles.container}>
-          <NavigationContainer>
-            <Stack.Navigator initialRouteName='Login'>
-              <Stack.Screen name='Login' component={LoginScreen} options={{
-                headerStyle: {
-                  height: 0
-                }
-              }} />
-              <Stack.Screen name='Home' component={HomeScreen} options={{
-                headerStyle: {
-                  height: 0
-                }
-              }} />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </View>
-      </ThemeProvider>
-    );
-  }
+export default function App() {
+  return (
+    <ThemeProvider theme={theme}>
+      <Body>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName={SCREENS.login.name}>
+            <Stack.Screen name={SCREENS.login.name} component={LoginScreen} options={{
+              header: () => null
+            }}/>
+            <Stack.Screen name={SCREENS.home.name} component={HomeScreen} options={{
+              header: () => null
+            }}/>
+            <Stack.Screen name={SCREENS.voteCandidate.name} component={VoteCandidateScreen} options={{
+              title: SCREENS.voteCandidate.title
+            }}/>
+            <Stack.Screen name={SCREENS.voteSabatProposal.name} component={VoteSabatProposalScreen} options={{
+              title: SCREENS.voteSabatProposal.title
+            }}/>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </Body>
+    </ThemeProvider>
+  )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-});

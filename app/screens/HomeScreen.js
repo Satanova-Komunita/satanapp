@@ -1,5 +1,6 @@
 import * as React from 'react'
 import {Container, Row, Button} from '../components'
+import {SCREENS} from '../constants'
 
 export default function HomeScreen({route, navigation}) {
   /*const {
@@ -9,13 +10,13 @@ export default function HomeScreen({route, navigation}) {
   return (
     <Container>
       <Row>
-        <Button label='Sabatní hlasování'/>
+        <Button label='Volba kandidáta' onPress={() => navigation.navigate(SCREENS.voteCandidate.name)}/>
       </Row>
       <Row>
-        <Button label='Volba kandidáta'/>
+        <Button label='Sabatní hlasování' onPress={() => navigation.navigate(SCREENS.voteSabatProposal.name)}/>
       </Row>
       <Row>
-        <Button label='Odhlásit' onPress={() => navigation.navigate('Login')}/>
+        <Button label='Odhlásit' onPress={() => navigation.navigate(SCREENS.login.name)}/>
       </Row>
     </Container>
   )

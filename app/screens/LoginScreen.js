@@ -1,6 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import {Input, Button, Container, Row} from '../components'
+import {SCREENS} from '../constants'
 
 const Header = styled.Text`
   font-size: 50px;
@@ -26,7 +27,7 @@ export default function LoginScreen({navigation}) {
       </Row>
       <Row>
         <Button
-          onPress={() => navigation.navigate('Home', {
+          onPress={() => navigation.navigate(SCREENS.home.name, {
             id
           })}
           label='Přihlásit'
