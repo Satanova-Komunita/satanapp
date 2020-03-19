@@ -17,6 +17,8 @@ const Body = styled.View`
   flex: 1
 `
 
+//export default from './storybook'
+
 export default function App() {
   return (
     <ThemeProvider theme={theme}>

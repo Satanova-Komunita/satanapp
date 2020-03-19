@@ -1,12 +1,14 @@
 {
   "main": "node_modules/expo/AppEntry.js",
+  "name": "satancare",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "storybook": "(adb reverse tcp:7007 tcp:7007 || true) && start-storybook"
   },
   "jest": {
     "preset": "jest-expo"
@@ -34,6 +36,12 @@
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
+    "@storybook/addon-actions": "^5.3.17",
+    "@storybook/addon-links": "^5.3.17",
+    "@storybook/addons": "^5.3.17",
+    "@storybook/react-native": "^5.3.17",
+    "@storybook/react-native-server": "^5.3.17",
+    "babel-loader": "^8.0.6",
     "babel-preset-expo": "~8.0.0",
     "expo-cli": "^3.15.4",
     "jest-expo": "~36.0.1"
