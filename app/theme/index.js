@@ -3,7 +3,8 @@ export const theme = {
     background: '#111'
   },
   text: {
-    color: '#ee1e3e'
+    color: '#ee1e3e',
+    darkColor: '#9b1429'
   },
   input: {
     backgroundColor: '#333',

@@ -1,16 +1,27 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { View } from 'react-native';
-import style from './style';
+import React from 'react'
+import styled, {ThemeProvider} from 'styled-components'
+import {theme} from '../../../theme'
 
-export default function CenterView({ children }) {
-  return <View style={style.main}>{children}</View>;
+const BackgroundContainer = styled.View`
+  flex: 1;
+  background-color: ${p => p.theme.screen.background};
+  justify-content: center;
+  align-items: center;
+`
+
+const SizeContainer = styled.View`
+  width: 90%;
+  align-items: center;
+`
+
+export default function CenterView({children}) {
+  return (
+    <ThemeProvider theme={theme}>
+      <BackgroundContainer>
+        <SizeContainer>
+          {children}
+        </SizeContainer>
+      </BackgroundContainer>
+    </ThemeProvider>
+  )
 }
-
-CenterView.defaultProps = {
-  children: null,
-};
-
-CenterView.propTypes = {
-  children: PropTypes.node,
-};

@@ -7,7 +7,7 @@ import {ThemeProvider} from 'styled-components'
 import LoginScreen from './screens/LoginScreen'
 import HomeScreen from './screens/HomeScreen'
 import VoteCandidateScreen from './screens/VoteCandidateScreen'
-import VoteSabatProposalScreen from './screens/VoteSabatProposalScreen'
+import VoteSabatProposal from './screens/VoteSabatProposal'
 import {theme} from './theme'
 import {SCREENS} from './constants'
 
@@ -34,7 +34,7 @@ export default function App() {
             <Stack.Screen name={SCREENS.voteCandidate.name} component={VoteCandidateScreen} options={{
               title: SCREENS.voteCandidate.title
             }}/>
-            <Stack.Screen name={SCREENS.voteSabatProposal.name} component={VoteSabatProposalScreen} options={{
+            <Stack.Screen name={SCREENS.voteSabatProposal.name} component={VoteSabatProposal} options={{
               title: SCREENS.voteSabatProposal.title
             }}/>
           </Stack.Navigator>
