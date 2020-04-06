@@ -3,21 +3,33 @@ import * as React from 'react'
 const IdentityContext = React.createContext({})
 IdentityContext.displayName = 'IdentityContext'
 
+const EMPTY_IDENTITY = {
+  token: '',
+  memberNumber: 0,
+  isLogged: false
+}
+
+const validateSetIdentity = ({token, memberNumber}) => {
+  if (typeof token !== 'string' || !token.length) {
+    throw new Error(`Token must be a non empty string`)
+  }
+  if (typeof memberNumber !== 'number' || memberNumber <= 0) {
+    throw new Error(`Member number must a number greater than 0`)
+  }
+}
+
 const IdentityProvider = ({children}) => {
-  const [token, setToken] = React.useState('')
-  const [memberNumber, setMemberNumber] = React.useState(0)
+  const [identity, setIdentity] = React.useState(EMPTY_IDENTITY)
 
   return (
     <IdentityContext.Provider value={{
-      token,
-      memberNumber,
+      identity,
       setIdentity: ({token, memberNumber}) => {
-        setToken(token)
-        setMemberNumber(memberNumber)
+        validateSetIdentity({token, memberNumber})
+        setIdentity({token, memberNumber, isLogged: true})
       },
       resetIdentity: () => {
-        setToken('')
-        setMemberNumber(0)
+        setIdentity(EMPTY_IDENTITY)
       }
     }}>
       {children}

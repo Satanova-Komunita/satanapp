@@ -4,9 +4,8 @@ import {SCREENS} from '../constants'
 import {useIdentity} from '../context'
 
 export default function HomeScreen({navigation}) {
-  const {token, memberNumber, resetIdentity} = useIdentity()
-  console.log('token', token)
-  console.log('memberNumber', memberNumber)
+  const {identity, resetIdentity} = useIdentity()
+  console.log('identity', identity)
 
   return (
     <Container>

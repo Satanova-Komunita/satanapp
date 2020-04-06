@@ -11,14 +11,40 @@ const Header = styled.Text`
   text-align: center;
 `
 
+const Error = styled.Text`
+  font-size: 18px;
+  color: ${p => p.theme.text.color};
+  text-align: center;
+`
+
+const parseResponse = (response) => {
+  const {
+    data: {
+      JWT,
+      userData: {
+        member_number: memberNumber
+      } = {}
+    } = {}
+  } = response
+
+  return {
+    token: JWT,
+    memberNumber: parseInt(memberNumber)
+  }
+}
+
 export default function LoginScreen({navigation}) {
   const [id, setId] = React.useState('')
+  const [hasError, setError] = React.useState(false)
   const {setIdentity} = useIdentity()
 
   return (
     <Container>
       <Row>
         <Header>SATANCARE</Header>
+      </Row>
+      <Row>
+        {hasError && <Error>Přihlášení se nezdařilo</Error>}
       </Row>
       <Row>
         <Input
@@ -31,16 +57,21 @@ export default function LoginScreen({navigation}) {
       <Row>
         <Button
           onPress={() => {
-            requestPost({url: API.login, payload: {
+            requestPost({
+              url: API.login, payload: {
                 member_number: id
-              }}).then(response => {
-              setIdentity({
-                token: response.data.JWT,
-                memberNumber: response.data.userData.member_number
-              })
-
-              navigation.navigate(SCREENS.home.name)
+              }
             })
+              .then(response => parseResponse(response))
+              .then(({token, memberNumber}) => setIdentity({token, memberNumber}))
+              .then(() => {
+                setError(false)
+                navigation.navigate(SCREENS.home.name)
+              })
+              .catch(error => {
+                console.log(error)
+                setError(true)
+              })
           }}
           label='Přihlásit'
         />
