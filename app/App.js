@@ -10,6 +10,7 @@ import VoteCandidateScreen from './screens/VoteCandidateScreen'
 import VoteSabatProposal from './screens/VoteSabatProposal'
 import {theme} from './theme'
 import {SCREENS} from './constants'
+import {IdentityProvider} from './context/identity'
 
 const Stack = createStackNavigator()
 
@@ -21,6 +22,7 @@ const Body = styled.View`
 
 export default function App() {
   return (
+  <IdentityProvider>
     <ThemeProvider theme={theme}>
       <Body>
         <NavigationContainer>
@@ -41,5 +43,6 @@ export default function App() {
         </NavigationContainer>
       </Body>
     </ThemeProvider>
+  </IdentityProvider>
   )
 }

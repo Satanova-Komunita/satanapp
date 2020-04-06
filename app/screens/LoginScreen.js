@@ -1,7 +1,9 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import {Input, Button, Container, Row} from '../components'
-import {SCREENS} from '../constants'
+import {SCREENS, API} from '../constants'
+import {useIdentity} from '../context'
+import {requestPost} from '../lib'
 
 const Header = styled.Text`
   font-size: 50px;
@@ -11,6 +13,7 @@ const Header = styled.Text`
 
 export default function LoginScreen({navigation}) {
   const [id, setId] = React.useState('')
+  const {setIdentity} = useIdentity()
 
   return (
     <Container>
@@ -27,9 +30,18 @@ export default function LoginScreen({navigation}) {
       </Row>
       <Row>
         <Button
-          onPress={() => navigation.navigate(SCREENS.home.name, {
-            id
-          })}
+          onPress={() => {
+            requestPost({url: API.login, payload: {
+                member_number: id
+              }}).then(response => {
+              setIdentity({
+                token: response.data.JWT,
+                memberNumber: response.data.userData.member_number
+              })
+
+              navigation.navigate(SCREENS.home.name)
+            })
+          }}
           label='Přihlásit'
         />
       </Row>
