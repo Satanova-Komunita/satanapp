@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import {ScrollView} from 'react-native'
+import {ScrollView, AsyncStorage} from 'react-native'
 import {QuadraticVotingButton} from './QuadraticVotingButton'
 import {useIdentity} from '../../context'
 import {Button} from '../../components'
@@ -18,15 +18,21 @@ const Content = styled.View`
   margin: 0 auto;
 `
 
-const VotesStatus = styled.Text`
+const StatusText = styled.Text`
   color: white;
   text-align: left;
   margin: 10px;
 `
 
-const ButtonContainer = styled.View`
+const SubmitButtonContainer = styled.View`
   margin: 10px;
 `
+
+const SubmitStatusTest = styled.View`
+  align-items: center;
+`
+
+const SELECTED_SABAT_ID = 1
 
 const STATUS = {
   loading: 'LOADING',
@@ -34,14 +40,76 @@ const STATUS = {
   done: 'DONE'
 }
 
+const STATUS_SUBMIT = {
+  default: 'DEFAULT',
+  sending: 'SENDING',
+  alreadySent: 'ALREADY_SENT',
+  error: 'ERROR'
+}
+
+const getSubmitButtonLabel = (status) => {
+  switch (status) {
+    case STATUS_SUBMIT.default:
+      return 'Odeslat'
+    case STATUS_SUBMIT.sending:
+      return 'Odesílám'
+    case STATUS_SUBMIT.alreadySent:
+      return 'Odhlasováno'
+    case STATUS_SUBMIT.error:
+      return 'Odeslat znovu'
+  }
+}
+
+const isSubmitButtonDisabled = (status) => status === STATUS_SUBMIT.sending || status === STATUS_SUBMIT.alreadySent
+
+function SubmitButton({status, onPress}) {
+  const label = getSubmitButtonLabel(status)
+  const disabled = isSubmitButtonDisabled(status)
+
+  return (
+    <SubmitButtonContainer>
+      <Button
+        label={label}
+        disabled={disabled}
+        onPress={onPress}
+      />
+      {status === STATUS_SUBMIT.error && (
+        <SubmitStatusTest>
+          <StatusText>Odeslání se nezdařilo</StatusText>
+        </SubmitStatusTest>
+      )}
+    </SubmitButtonContainer>
+  )
+}
+
+const loadInitState = async () => {
+  const value = await AsyncStorage.getItem(`sabat_${SELECTED_SABAT_ID}`)
+
+  if (value !== null) {
+    return JSON.parse(value)
+  }
+  return value
+}
+
 export default function VoteSabatProposal() {
   const [status, setStatus] = React.useState(STATUS.loading)
+  const [statusSubmit, setStatusSubmit] = React.useState(STATUS_SUBMIT.default)
   const [votes, setVotes] = React.useState(100)
   const [proposals, setProposals] = React.useState([])
   const {identity} = useIdentity()
 
   React.useEffect(() => {
-    fetchProposals(1, identity.token)
+    // TD refactor this to HoC
+    loadInitState()
+      .then((state) => {
+        if (state !== null) {
+          setVotes(state.votes)
+          setStatusSubmit(STATUS_SUBMIT.alreadySent)
+          return state.proposals
+        } else {
+          return fetchProposals(SELECTED_SABAT_ID, identity.token)
+        }
+      })
       .then(proposals => {
         setProposals([...proposals])
         setStatus(STATUS.done)
@@ -54,45 +122,56 @@ export default function VoteSabatProposal() {
 
   return (
     <Container>
-      {status === STATUS.loading && <VotesStatus>načítám...</VotesStatus>}
-      {status === STATUS.error && <VotesStatus>načítání se nezdařilo</VotesStatus>}
+      {status === STATUS.loading && <StatusText>načítám...</StatusText>}
+      {status === STATUS.error && <StatusText>načítání se nezdařilo</StatusText>}
       {status === STATUS.done &&
-        <>
-          <VotesStatus>Zbývajících hlasů: {votes}</VotesStatus>
-          <ScrollView>
-            <Content>
-              {
-                proposals.map(proposal => <QuadraticVotingButton
-                  key={proposal.id}
-                  votes={votes}
-                  value={proposal.value}
-                  text={proposal.text}
-                  handleOnChange={({newVotes, newProposalValue}) => {
-                    setVotes(newVotes)
-                    setProposals(proposals.map(newProposal => newProposal.id !== proposal.id ? newProposal : ({
-                      ...newProposal,
-                      value: newProposalValue
-                    })))
-                  }}
-                />)
-              }
-            </Content>
-            <ButtonContainer>
-              <Button
-                label='Odeslat'
-                disabled={false}
-                onPress={() => {
-                  sendProposalVotes(identity.memberNumber, identity.token, proposals)
-                    .then(response => {
-                      console.log('response', response)
-                    }).catch(error => {
-                      console.error('error', error)
-                    })
+      <>
+        <StatusText>Zbývajících hlasů: {votes}</StatusText>
+        <ScrollView>
+          <Content>
+            {
+              proposals.map(proposal => <QuadraticVotingButton
+                key={proposal.id}
+                votes={votes}
+                value={proposal.value}
+                text={proposal.text}
+                handleOnChange={({newVotes, newProposalValue}) => {
+                  setVotes(newVotes)
+                  setProposals(proposals.map(newProposal => newProposal.id !== proposal.id ? newProposal : ({
+                    ...newProposal,
+                    value: newProposalValue
+                  })))
                 }}
-              />
-            </ButtonContainer>
-          </ScrollView>
-        </>
+              />)
+            }
+          </Content>
+          <SubmitButton
+            status={statusSubmit}
+            onPress={() => {
+              setStatusSubmit(STATUS_SUBMIT.sending)
+              sendProposalVotes(identity.memberNumber, identity.token, proposals)
+                .then(response => {
+                  console.log('response', response)
+                  return AsyncStorage.setItem(`sabat_${SELECTED_SABAT_ID}`, JSON.stringify({
+                    votes,
+                    proposals
+                  }))
+                })
+                .then(() => setStatusSubmit(STATUS_SUBMIT.alreadySent))
+                .catch(error => {
+                  setStatusSubmit(STATUS_SUBMIT.error)
+                  console.log('error', error)
+                })
+            }}
+          />
+          <SubmitButtonContainer>
+            <Button
+              label={'Reset (dev)'}
+              onPress={() => AsyncStorage.clear()}
+            />
+          </SubmitButtonContainer>
+        </ScrollView>
+      </>
       }
     </Container>
   )

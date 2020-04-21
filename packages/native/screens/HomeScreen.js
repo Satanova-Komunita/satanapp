@@ -10,9 +10,6 @@ export default function HomeScreen({navigation}) {
   return (
     <Container>
       <Row>
-        <Button label='Volba kandidáta' onPress={() => navigation.navigate(SCREENS.voteCandidate.name)}/>
-      </Row>
-      <Row>
         <Button label='Sabatní hlasování' onPress={() => navigation.navigate(SCREENS.voteSabatProposal.name)}/>
       </Row>
       <Row>
