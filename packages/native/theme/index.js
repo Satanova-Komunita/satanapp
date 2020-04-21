@@ -3,11 +3,22 @@ export const theme = {
     background: '#111'
   },
   text: {
-    color: '#ee1e3e',
-    darkColor: '#9b1429'
+    color: '#ee1e3e'
   },
   input: {
-    backgroundColor: '#333',
-    borderColor: '#444'
+    background: '#333',
+    border: '#444'
+  },
+  button: {
+    default: {
+      color: '#ee1e3e',
+      background: '#333',
+      border: '#444'
+    },
+    disabled: {
+      color: '#9b1429',
+      background: '#111',
+      border: '#000'
+    }
   }
 }

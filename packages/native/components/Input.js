@@ -4,12 +4,12 @@ import styled, {ThemeContext} from 'styled-components'
 const StyledTextInput = styled.TextInput`
   color: ${p => p.theme.text.color};
   font-size: 20px;
-  background-color: ${p => p.theme.input.backgroundColor};
+  background-color: ${p => p.theme.input.background};
   padding: 0 20px;
   width: 100%;
   height: 60px;
   text-align: center;
-  border: 1px solid ${p => p.theme.input.borderColor};
+  border: 1px solid ${p => p.theme.input.border};
   border-radius: 10px;
 `
 

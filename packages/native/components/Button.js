@@ -2,28 +2,28 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 const StyledTouchableOpacity = styled.TouchableOpacity`
-  color: ${p => p.theme.text.color};
-  background-color: ${p => p.theme.input.backgroundColor};
+  background: ${p => p.disabled ? p.theme.button.disabled.background : p.theme.button.default.background};
   width: 100%;
   height: 60px;
-  border: 1px solid ${p => p.theme.input.borderColor};
+  border: 1px solid ${p => p.disabled ? p.theme.button.disabled.border : p.theme.button.default.border};
   border-radius: 10px;
 `
 
 const StyledText = styled.Text`
-  color: ${p => p.theme.text.color};
+  color: ${p => p.disabled ? p.theme.button.disabled.color : p.theme.button.default.color};
   text-align: center;
   font-size: 20px;
   line-height: 60px;
   font-weight: bold;
 `
 
-export const Button = ({label, ...props}) => {
+export const Button = ({label, disabled = false, ...props}) => {
   return (
     <StyledTouchableOpacity
       {...props}
+      disabled={disabled}
     >
-      <StyledText>{label}</StyledText>
+      <StyledText disabled={disabled}>{label}</StyledText>
     </StyledTouchableOpacity>
   )
 }

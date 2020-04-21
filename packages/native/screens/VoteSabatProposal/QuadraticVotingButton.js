@@ -16,7 +16,7 @@ const VotingText = styled.Text`
 `
 
 const ButtonText = styled.Text`
-  color: ${p => p.disabled? p.theme.text.darkColor : p.theme.text.color};
+  color: ${p => p.disabled ? p.theme.button.disabled.color : p.theme.button.default.color};
   font-size: 30px;
   font-weight: bold;
   padding: 5px 25px;
@@ -26,7 +26,7 @@ const ButtonText = styled.Text`
   border-right-width: 3px;
   border-left-width: 3px;
   text-align: center;
-  background: ${p => p.disabled? '#111' : '#222'};
+  background: ${p => p.disabled ? p.theme.button.disabled.background : p.theme.button.default.background};
 `
 
 const StatusText = styled.Text`
