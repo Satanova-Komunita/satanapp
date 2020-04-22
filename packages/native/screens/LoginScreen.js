@@ -22,7 +22,7 @@ const parseResponse = (response) => {
     data: {
       JWT,
       userData: {
-        member_number: memberNumber
+        ID: memberNumber
       } = {}
     } = {}
   } = response
