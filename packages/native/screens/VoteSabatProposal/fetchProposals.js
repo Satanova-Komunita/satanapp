@@ -13,7 +13,7 @@ const validateResponse = (response) => {
 
 const parseProposals = (data) => data.map(record => ({
   id: record.ID,
-  text: record.description,
+  text: record.name,
   value: 0
 }))
 
