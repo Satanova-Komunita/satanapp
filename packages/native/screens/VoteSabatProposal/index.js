@@ -1,11 +1,12 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import {ScrollView, AsyncStorage} from 'react-native'
+import {ScrollView} from 'react-native'
 import {QuadraticVotingButton} from './QuadraticVotingButton'
 import {useIdentity} from '../../context'
 import {Button} from '../../components'
 import {fetchProposals} from './fetchProposals'
 import {sendProposalVotes} from './sendProposalVotes'
+import {getItem, setItem, clear} from '../../lib'
 
 export const Container = styled.View`
   flex: 1;
@@ -82,15 +83,6 @@ function SubmitButton({status, onPress}) {
   )
 }
 
-const loadInitState = async () => {
-  const value = await AsyncStorage.getItem(`sabat_${SELECTED_SABAT_ID}`)
-
-  if (value !== null) {
-    return JSON.parse(value)
-  }
-  return value
-}
-
 export default function VoteSabatProposal() {
   const [status, setStatus] = React.useState(STATUS.loading)
   const [statusSubmit, setStatusSubmit] = React.useState(STATUS_SUBMIT.default)
@@ -99,8 +91,7 @@ export default function VoteSabatProposal() {
   const {identity} = useIdentity()
 
   React.useEffect(() => {
-    // TD refactor this to HoC
-    loadInitState()
+    getItem(`${identity.memberNumber}:sabat:${SELECTED_SABAT_ID}`)
       .then((state) => {
         if (state !== null) {
           setVotes(state.votes)
@@ -152,10 +143,10 @@ export default function VoteSabatProposal() {
               sendProposalVotes(identity.memberNumber, identity.token, proposals)
                 .then(response => {
                   console.log('response', response)
-                  return AsyncStorage.setItem(`sabat_${SELECTED_SABAT_ID}`, JSON.stringify({
+                  return setItem(`${identity.memberNumber}:sabat:${SELECTED_SABAT_ID}`, {
                     votes,
                     proposals
-                  }))
+                  })
                 })
                 .then(() => setStatusSubmit(STATUS_SUBMIT.alreadySent))
                 .catch(error => {
@@ -167,7 +158,7 @@ export default function VoteSabatProposal() {
           <SubmitButtonContainer>
             <Button
               label={'Reset (dev)'}
-              onPress={() => AsyncStorage.clear()}
+              onPress={() => clear()}
             />
           </SubmitButtonContainer>
         </ScrollView>
