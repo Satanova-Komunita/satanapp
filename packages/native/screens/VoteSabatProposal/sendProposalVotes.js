@@ -19,10 +19,10 @@ const mockInvalidResponse = {
 }
 
 const preparePayload = (memberNumber, proposals) => ({
-  member_ID: parseInt(memberNumber),
+  member_ID: memberNumber,
   votes: proposals.map(proposal => ({
-    proposal_ID: parseInt(proposal.id),
-    value: parseInt(proposal.value)
+    proposal_ID: proposal.id,
+    value: proposal.value
   }))
 })
 
