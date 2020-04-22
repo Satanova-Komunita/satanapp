@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Satancare",
-    "slug": "satancare",
+    "name": "Satan App",
+    "slug": "satan-pp",
     "privacy": "public",
     "sdkVersion": "36.0.0",
     "platforms": [
@@ -24,8 +24,9 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "ios": {
-      "supportsTablet": true
+    "android": {
+      "package": "com.SatanovaKomunita.satanapp",
+      "versionCode": 1
     }
   }
 }
