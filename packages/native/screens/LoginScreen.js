@@ -41,7 +41,7 @@ export default function LoginScreen({navigation}) {
   return (
     <Container>
       <Row>
-        <Header>SATANCARE</Header>
+        <Header>SATAN APP</Header>
       </Row>
       <Row>
         {hasError && <Error>Přihlášení se nezdařilo</Error>}
@@ -65,8 +65,9 @@ export default function LoginScreen({navigation}) {
               .then(response => parseResponse(response))
               .then(({token, memberNumber}) => setIdentity({token, memberNumber}))
               .then(() => {
-                setError(false)
                 navigation.navigate(SCREENS.home.name)
+                setError(false)
+                setId('')
               })
               .catch(error => {
                 console.log(error)

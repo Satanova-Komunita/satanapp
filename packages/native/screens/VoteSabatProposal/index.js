@@ -155,12 +155,6 @@ export default function VoteSabatProposal() {
                 })
             }}
           />
-          <SubmitButtonContainer>
-            <Button
-              label={'Reset (dev)'}
-              onPress={() => clear()}
-            />
-          </SubmitButtonContainer>
         </ScrollView>
       </>
       }
