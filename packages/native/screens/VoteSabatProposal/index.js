@@ -6,7 +6,7 @@ import {useIdentity} from '../../context'
 import {Button} from '../../components'
 import {fetchProposals} from './fetchProposals'
 import {sendProposalVotes} from './sendProposalVotes'
-import {getItem, setItem, clear} from '../../lib'
+import {getItem, setItem} from '../../lib'
 
 export const Container = styled.View`
   flex: 1;
