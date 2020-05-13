@@ -1,10 +1,10 @@
 interface GetArgs {
   url: string,
-  bearerToken: string
+  bearerToken?: string
 }
 
 interface PostArgs extends GetArgs {
-  payload?: object
+  payload?: any
 }
 
 interface RequestArgs extends PostArgs {

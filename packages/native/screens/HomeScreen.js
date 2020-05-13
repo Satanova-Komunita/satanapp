@@ -14,7 +14,7 @@ export default function HomeScreen({navigation}) {
       <Row>
         <Button label='Odhlásit' onPress={() => {
           resetIdentity()
-          navigation.navigate(SCREENS.login.name)
+          navigation.navigate('Login')
         }}/>
       </Row>
     </Container>
