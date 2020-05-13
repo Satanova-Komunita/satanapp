@@ -14,12 +14,12 @@ const Body = styled.View`
 
 export default function App() {
   return (
-  <IdentityProvider>
-    <ThemeProvider theme={theme}>
-      <Body>
-        <Navigation/>
-      </Body>
-    </ThemeProvider>
-  </IdentityProvider>
+    <IdentityProvider>
+      <ThemeProvider theme={theme}>
+        <Body>
+          <Navigation/>
+        </Body>
+      </ThemeProvider>
+    </IdentityProvider>
   )
 }
