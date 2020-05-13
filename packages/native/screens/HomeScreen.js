@@ -4,8 +4,7 @@ import {SCREENS} from '../constants'
 import {useIdentity} from '../context'
 
 export default function HomeScreen({navigation}) {
-  const {identity, resetIdentity} = useIdentity()
-  console.log('identity', identity)
+  const {resetIdentity} = useIdentity()
 
   return (
     <Container>

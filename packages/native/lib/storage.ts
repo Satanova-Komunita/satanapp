@@ -1,6 +1,6 @@
 import {AsyncStorage} from 'react-native'
 
-export const getItem = async (key) => {
+export const storageGet = async <A=object>(key: string): Promise<A|null> => {
   const value = await AsyncStorage.getItem(key)
 
   if (value !== null) {
@@ -9,7 +9,7 @@ export const getItem = async (key) => {
   return value
 }
 
-export const setItem = (key, value) => {
+export const storageSet = (key: string, value: object) => {
   return AsyncStorage.setItem(key, JSON.stringify(value))
 }
 

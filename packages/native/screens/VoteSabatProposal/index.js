@@ -6,7 +6,7 @@ import {useIdentity} from '../../context'
 import {Button} from '../../components'
 import {fetchProposals} from './fetchProposals'
 import {sendProposalVotes} from './sendProposalVotes'
-import {getItem, setItem} from '../../lib'
+import {storageGet, storageSet} from '../../lib'
 
 export const Container = styled.View`
   flex: 1;
@@ -91,7 +91,7 @@ export default function VoteSabatProposal() {
   const {identity} = useIdentity()
 
   React.useEffect(() => {
-    getItem(`${identity.memberNumber}:sabat:${SELECTED_SABAT_ID}`)
+    storageGet(`${identity.memberNumber}:sabat:${SELECTED_SABAT_ID}`)
       .then((state) => {
         if (state !== null) {
           setVotes(state.votes)
@@ -143,7 +143,7 @@ export default function VoteSabatProposal() {
               sendProposalVotes(identity.memberNumber, identity.token, proposals)
                 .then(response => {
                   console.log('response', response)
-                  return setItem(`${identity.memberNumber}:sabat:${SELECTED_SABAT_ID}`, {
+                  return storageSet(`${identity.memberNumber}:sabat:${SELECTED_SABAT_ID}`, {
                     votes,
                     proposals
                   })
