@@ -86,7 +86,7 @@ function SubmitButton({status, onPress}) {
 export default function VoteSabatProposal() {
   const [status, setStatus] = React.useState(STATUS.loading)
   const [statusSubmit, setStatusSubmit] = React.useState(STATUS_SUBMIT.default)
-  const [votes, setVotes] = React.useState(100)
+  const [votes, setVotes] = React.useState(210)
   const [proposals, setProposals] = React.useState([])
   const {identity} = useIdentity()
 
