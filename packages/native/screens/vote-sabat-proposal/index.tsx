@@ -1,14 +1,13 @@
 import * as React from 'react'
-import styled from 'styled-components'
 import {ScrollView} from 'react-native'
-import {QuadraticVotingButton} from './QuadraticVotingButton'
+import styled from 'styled-components/native'
 import {useIdentity} from '../../context'
 import {Button} from '../../components'
-import {fetchProposals} from './fetchProposals'
-import {sendProposalVotes} from './sendProposalVotes'
 import {storageGet, storageSet} from '../../lib'
+import {QuadraticVotingButton} from './quadratic-voting-button'
+import {fetchProposals, sendProposalVotes} from './requests'
 
-export const Container = styled.View`
+const Container = styled.View`
   flex: 1;
   background-color: ${p => p.theme.screen.background};
 `
@@ -48,7 +47,7 @@ const STATUS_SUBMIT = {
   error: 'ERROR'
 }
 
-const getSubmitButtonLabel = (status) => {
+const getSubmitButtonLabel = (status: string) => {
   switch (status) {
     case STATUS_SUBMIT.default:
       return 'Odeslat'
@@ -61,9 +60,9 @@ const getSubmitButtonLabel = (status) => {
   }
 }
 
-const isSubmitButtonDisabled = (status) => status === STATUS_SUBMIT.sending || status === STATUS_SUBMIT.alreadySent
+const isSubmitButtonDisabled = (status: string) => status === STATUS_SUBMIT.sending || status === STATUS_SUBMIT.alreadySent
 
-function SubmitButton({status, onPress}) {
+function SubmitButton({status, onPress}: {status: string, onPress: Function}) {
   const label = getSubmitButtonLabel(status)
   const disabled = isSubmitButtonDisabled(status)
 
@@ -83,16 +82,16 @@ function SubmitButton({status, onPress}) {
   )
 }
 
-export default function VoteSabatProposal() {
+export const VoteSabatProposal: React.FunctionComponent = () => {
   const [status, setStatus] = React.useState(STATUS.loading)
   const [statusSubmit, setStatusSubmit] = React.useState(STATUS_SUBMIT.default)
   const [votes, setVotes] = React.useState(210)
-  const [proposals, setProposals] = React.useState([])
+  const [proposals, setProposals] = React.useState<Array<any>>([])
   const {identity} = useIdentity()
 
   React.useEffect(() => {
     storageGet(`${identity.memberNumber}:sabat:${SELECTED_SABAT_ID}`)
-      .then((state) => {
+      .then((state: any) => {
         if (state !== null) {
           setVotes(state.votes)
           setStatusSubmit(STATUS_SUBMIT.alreadySent)
@@ -101,7 +100,7 @@ export default function VoteSabatProposal() {
           return fetchProposals(SELECTED_SABAT_ID, identity.token)
         }
       })
-      .then(proposals => {
+      .then((proposals) => {
         setProposals([...proposals])
         setStatus(STATUS.done)
       })
@@ -126,7 +125,7 @@ export default function VoteSabatProposal() {
                 votes={votes}
                 value={proposal.value}
                 text={proposal.text}
-                handleOnChange={({newVotes, newProposalValue}) => {
+                handleOnChange={({newVotes, newProposalValue}: any) => {
                   setVotes(newVotes)
                   setProposals(proposals.map(newProposal => newProposal.id !== proposal.id ? newProposal : ({
                     ...newProposal,

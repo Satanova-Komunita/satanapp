@@ -1,2 +1,3 @@
-export * from './login/index'
-export * from './home/index'
+export * from './login'
+export * from './home'
+export * from './vote-sabat-proposal'

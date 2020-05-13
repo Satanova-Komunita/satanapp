@@ -1,7 +1,7 @@
-import {requestGet} from '../../lib'
-import {API} from '../../constants'
+import {requestGet} from '../../../lib'
+import {API} from '../../../constants'
 
-const validateResponse = (response) => {
+const validateResponse = (response: any) => {
   if (typeof response !== 'object') {
     throw new Error('Response must be an object')
   }
@@ -11,15 +11,15 @@ const validateResponse = (response) => {
   }
 }
 
-const parseProposals = (data) => data.map(record => ({
+const parseProposals = (data: Array<any>) => data.map(record => ({
   id: record.ID,
   text: record.name,
   value: 0
 }))
 
-export const fetchProposals = async (sabatId, token) => {
+export const fetchProposals = async (sabatId: number, token: string) => {
   const response = await requestGet({
-    url: API.sabatsProposals.replace(':id', sabatId),
+    url: API.sabatsProposals.replace(':id', sabatId.toString()),
     bearerToken: token
   })
   validateResponse(response)

@@ -1,6 +1,19 @@
 import React from 'react'
-import {TouchableOpacity} from 'react-native'
-import styled from 'styled-components'
+import {TouchableOpacity, GestureResponderEvent} from 'react-native'
+import styled from 'styled-components/native'
+
+interface Props {
+  text: string,
+  handleOnChange: Function,
+  value: number,
+  votes: number
+}
+
+interface VotingButtonProps {
+  symbol: '+'|'-',
+  disabled: boolean,
+  handleOnChange: (event: GestureResponderEvent) => void
+}
 
 const Container = styled.View`
   background-color: #222;
@@ -41,7 +54,7 @@ const StyledVotingStatus = styled.View`
   flex-direction: row;
 `
 
-const VotingButton = ({symbol, disabled, handleOnChange}) => {
+const VotingButton: React.FunctionComponent<VotingButtonProps> = ({symbol, disabled, handleOnChange}) => {
   return (
     <TouchableOpacity
       onPress={handleOnChange}
@@ -52,7 +65,7 @@ const VotingButton = ({symbol, disabled, handleOnChange}) => {
   )
 }
 
-const calculatePlus = (value, votes) => {
+const calculatePlus = (value: number, votes: number) => {
   const previousPrice = value * value
   const newProposalValuePlus = value + 1
   const priceForPlus = (newProposalValuePlus * newProposalValuePlus) - previousPrice
@@ -64,7 +77,7 @@ const calculatePlus = (value, votes) => {
   }
 }
 
-const calculateMinus = (value, votes) => {
+const calculateMinus = (value: number, votes: number) => {
   const previousPrice = value * value
   const newProposalValueMinus = value - 1
   const priceForMinus = previousPrice - (newProposalValueMinus * newProposalValueMinus)
@@ -76,7 +89,7 @@ const calculateMinus = (value, votes) => {
   }
 }
 
-export const QuadraticVotingButton = ({text, handleOnChange, value, votes}) => {
+export const QuadraticVotingButton: React.FunctionComponent<Props> = ({text, handleOnChange, value, votes}) => {
   const {newVotesPlus, newProposalValuePlus} = calculatePlus(value, votes)
   const {newVotesMinus, newProposalValueMinus} = calculateMinus(value, votes)
 

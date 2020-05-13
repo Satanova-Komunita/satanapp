@@ -1,8 +1,7 @@
 import * as React from 'react'
 import {NavigationContainer} from '@react-navigation/native'
 import {createStackNavigator} from '@react-navigation/stack'
-import VoteSabatProposal from '../screens/VoteSabatProposal'
-import {LoginScreen, HomeScreen} from '../screens'
+import {LoginScreen, HomeScreen, VoteSabatProposal} from '../screens'
 
 export type RootStackParamList = {
   Login: undefined,
