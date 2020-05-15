@@ -1,27 +1,27 @@
 import * as React from 'react'
+import {storageSet, removeItem, storageGet} from '../lib'
 
 interface Identity {
   token: string,
   memberNumber: number,
-  isLogged: boolean
-}
-
-interface SetIdentityArgs {
-  token: string,
-  memberNumber: number
+  isLogged: boolean,
+  isInitialized: boolean
 }
 
 interface IdentityContextValue {
   identity: Identity,
-  setIdentity: (args: SetIdentityArgs) => void,
+  setIdentity: (token: string, memberNumber: number) => void,
   resetIdentity: () => void
 }
 
 const EMPTY_IDENTITY: Identity = {
   token: '',
   memberNumber: 0,
-  isLogged: false
+  isLogged: false,
+  isInitialized: false
 }
+
+const STORAGE_KEY = 'identity:last'
 
 const IdentityContext = React.createContext<IdentityContextValue>({
   identity: EMPTY_IDENTITY,
@@ -31,27 +31,39 @@ const IdentityContext = React.createContext<IdentityContextValue>({
 
 IdentityContext.displayName = 'IdentityContext'
 
-/*
-const validateSetIdentity = ({token, memberNumber}) => {
-  if (typeof token !== 'string' || !token.length) {
-    throw new Error(`Token must be a non empty string`)
-  }
-  if (typeof memberNumber !== 'number' || memberNumber <= 0) {
-    throw new Error(`Member number must a number greater than 0`)
-  }
-}*/
-
 const IdentityProvider: React.FunctionComponent = ({children}) => {
-  const [identity, setIdentity] = React.useState<Identity>(EMPTY_IDENTITY)
+  const [identity, setIdentity] = React.useState<Identity>(() => {
+    return EMPTY_IDENTITY
+  })
+
+  React.useEffect(() => {
+    storageGet(STORAGE_KEY)
+      .then((result: any) => {
+        if (result === null) {
+          return setIdentity({...EMPTY_IDENTITY, isInitialized: true})
+        }
+        return setIdentity({
+          token: result.token,
+          memberNumber: result.memberNumber,
+          isLogged: true,
+          isInitialized: true
+        })
+      })
+      .catch(console.error)
+  }, [])
 
   return (
     <IdentityContext.Provider value={{
       identity,
-      setIdentity: ({token, memberNumber}: SetIdentityArgs) => {
-        setIdentity({token, memberNumber, isLogged: true})
+      setIdentity: (token, memberNumber) => {
+        return storageSet(STORAGE_KEY, {token, memberNumber}).then(() => {
+          setIdentity({token, memberNumber, isLogged: true, isInitialized: true})
+        })
       },
       resetIdentity: () => {
-        setIdentity(EMPTY_IDENTITY)
+        return removeItem(STORAGE_KEY).then(() => {
+          setIdentity({...EMPTY_IDENTITY, isInitialized: true})
+        })
       }
     }}>
       {children}

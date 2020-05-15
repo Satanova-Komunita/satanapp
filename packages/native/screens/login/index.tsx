@@ -1,15 +1,9 @@
 import * as React from 'react'
 import styled from 'styled-components/native'
-import {StackNavigationProp} from '@react-navigation/stack'
-import {RootStackParamList} from '../../navigation'
 import {Button, Container, Input, Row} from '../../components'
 import {requestPost} from '../../lib'
 import {API} from '../../constants'
 import {useIdentity} from '../../context'
-
-interface Props {
-  navigation: StackNavigationProp<RootStackParamList, 'Login'>
-}
 
 const Header = styled.Text`
   font-size: 50px;
@@ -51,7 +45,7 @@ const parseResponse = (response: any) => ({
   memberNumber: parseInt(response.data.userData.member_number)
 })
 
-export const LoginScreen: React.FunctionComponent<Props> = ({navigation}) => {
+export const LoginScreen: React.FunctionComponent = () => {
   const [id, setId] = React.useState('')
   const [hasError, setError] = React.useState(false)
   const {setIdentity} = useIdentity()
@@ -81,12 +75,7 @@ export const LoginScreen: React.FunctionComponent<Props> = ({navigation}) => {
               }
             }).then(response => validateResponse(response))
               .then(response => parseResponse(response))
-              .then(response => {
-                setError(false)
-                setId('')
-                setIdentity({token: response.token, memberNumber: response.memberNumber})
-                navigation.navigate('Home')
-              })
+              .then(response => setIdentity(response.token, response.memberNumber))
               .catch((error) => {
                 console.error(error)
                 setError(true)

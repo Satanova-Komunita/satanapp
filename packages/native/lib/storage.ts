@@ -13,4 +13,6 @@ export const storageSet = (key: string, value: object) => {
   return AsyncStorage.setItem(key, JSON.stringify(value))
 }
 
+export const removeItem = (key: string) => AsyncStorage.removeItem(key)
+
 export const storageClear = () => AsyncStorage.clear()
