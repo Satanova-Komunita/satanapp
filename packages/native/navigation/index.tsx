@@ -15,14 +15,14 @@ const Stack = createStackNavigator<RootStackParamList>()
 export const Navigation: React.FunctionComponent = () => {
   const {identity} = useIdentity()
 
-  if (!identity.isInitialized) {
+  if (identity.status === 'INITIALIZING') {
     return null
   }
 
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {identity.isLogged ? (
+        {identity.status === 'SIGNED_IN' ? (
           <>
             <Stack.Screen name={'Home'} component={HomeScreen} options={{
               header: () => null
