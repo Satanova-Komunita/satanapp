@@ -29,7 +29,7 @@ const VotingText = styled.Text`
 `
 
 const ButtonText = styled.Text`
-  color: ${p => p.disabled ? p.theme.button.disabled.color : p.theme.button.default.color};
+  color: ${p => p.disabled ? p.theme.button.disabled.color : p.theme.button.dark.color};
   font-size: 30px;
   font-weight: bold;
   padding: 5px 25px;
@@ -39,7 +39,7 @@ const ButtonText = styled.Text`
   border-right-width: 3px;
   border-left-width: 3px;
   text-align: center;
-  background: ${p => p.disabled ? p.theme.button.disabled.background : p.theme.button.default.background};
+  background: ${p => p.disabled ? p.theme.button.disabled.background : p.theme.button.dark.background};
 `
 
 const StatusText = styled.Text`
@@ -48,6 +48,8 @@ const StatusText = styled.Text`
   padding: 5px 25px;
   flex: 1;
   text-align: center;
+  border-color: #111;
+  border-top-width: 3px;
 `
 
 const StyledVotingStatus = styled.View`

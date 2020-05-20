@@ -15,6 +15,11 @@ export const theme = {
       background: '#333',
       border: '#444'
     },
+    dark: {
+      color: '#ee1e3e',
+      background: '#222',
+      border: '#444'
+    },
     disabled: {
       color: '#9b1429',
       background: '#111',

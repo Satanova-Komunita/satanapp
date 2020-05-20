@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {ScrollView} from 'react-native'
+import {FlatList} from 'react-native'
 import styled from 'styled-components/native'
 import {useIdentity} from '../../context'
 import {Button} from '../../components'
@@ -10,12 +10,6 @@ import {fetchProposals, sendProposalVotes} from './requests'
 const Container = styled.View`
   flex: 1;
   background-color: ${p => p.theme.screen.background};
-`
-
-const Content = styled.View`
-  align-items: center;
-  width: 100%;
-  margin: 0 auto;
 `
 
 const StatusText = styled.Text`
@@ -117,31 +111,29 @@ export const VoteSabatProposal: React.FunctionComponent = () => {
       {status === STATUS.done &&
       <>
         <StatusText>Zbývajících hlasů: {votes}</StatusText>
-        <ScrollView>
-          <Content>
-            {
-              proposals.map(proposal => <QuadraticVotingButton
-                key={proposal.id}
+          <FlatList
+            data={proposals}
+            renderItem={({item}) => <QuadraticVotingButton
+                key={item.id}
                 votes={votes}
-                value={proposal.value}
-                text={proposal.text}
+                value={item.value}
+                text={item.text}
                 handleOnChange={({newVotes, newProposalValue}: any) => {
                   setVotes(newVotes)
-                  setProposals(proposals.map(newProposal => newProposal.id !== proposal.id ? newProposal : ({
+                  setProposals(proposals.map(newProposal => newProposal.id !== item.id ? newProposal : ({
                     ...newProposal,
                     value: newProposalValue
                   })))
                 }}
-              />)
+              />
             }
-          </Content>
+          />
           <SubmitButton
             status={statusSubmit}
             onPress={() => {
               setStatusSubmit(STATUS_SUBMIT.sending)
               sendProposalVotes(identity.memberNumber, identity.token, proposals)
-                .then(response => {
-                  console.log('response', response)
+                .then(() => {
                   return storageSet(`${identity.memberNumber}:sabat:${SELECTED_SABAT_ID}`, {
                     votes,
                     proposals
@@ -154,7 +146,6 @@ export const VoteSabatProposal: React.FunctionComponent = () => {
                 })
             }}
           />
-        </ScrollView>
       </>
       }
     </Container>
