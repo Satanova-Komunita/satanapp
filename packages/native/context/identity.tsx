@@ -20,7 +20,7 @@ type ActionPayload = {
 
 type Action =
   | {type: 'SIGN_IN', payload: ActionPayload}
-  | {type: 'SIGN_OUT' }
+  | {type: 'SIGN_OUT'}
 
 const reducer = (state: Identity, action: Action): Identity => {
   switch (action.type) {
