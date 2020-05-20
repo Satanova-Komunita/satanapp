@@ -2,10 +2,11 @@ import * as React from 'react'
 import {FlatList} from 'react-native'
 import styled from 'styled-components/native'
 import {useIdentity} from '../../context'
-import {Button} from '../../components'
 import {storageGet, storageSet} from '../../lib'
 import {QuadraticVotingButton} from './quadratic-voting-button'
+import {SubmitButton} from './submit-button'
 import {fetchProposals, sendProposalVotes} from './requests'
+import {STATUS} from './constants'
 
 const Container = styled.View`
   flex: 1;
@@ -18,67 +19,11 @@ const StatusText = styled.Text`
   margin: 10px;
 `
 
-const SubmitButtonContainer = styled.View`
-  margin: 10px;
-`
-
-const SubmitStatusTest = styled.View`
-  align-items: center;
-`
-
 const SELECTED_SABAT_ID = 1
 
-const STATUS = {
-  loading: 'LOADING',
-  error: 'ERROR',
-  done: 'DONE'
-}
-
-const STATUS_SUBMIT = {
-  default: 'DEFAULT',
-  sending: 'SENDING',
-  alreadySent: 'ALREADY_SENT',
-  error: 'ERROR'
-}
-
-const getSubmitButtonLabel = (status: string) => {
-  switch (status) {
-    case STATUS_SUBMIT.default:
-      return 'Odeslat'
-    case STATUS_SUBMIT.sending:
-      return 'Odesílám'
-    case STATUS_SUBMIT.alreadySent:
-      return 'Odhlasováno'
-    case STATUS_SUBMIT.error:
-      return 'Odeslat znovu'
-  }
-}
-
-const isSubmitButtonDisabled = (status: string) => status === STATUS_SUBMIT.sending || status === STATUS_SUBMIT.alreadySent
-
-function SubmitButton({status, onPress}: {status: string, onPress: Function}) {
-  const label = getSubmitButtonLabel(status)
-  const disabled = isSubmitButtonDisabled(status)
-
-  return (
-    <SubmitButtonContainer>
-      <Button
-        label={label}
-        disabled={disabled}
-        onPress={onPress}
-      />
-      {status === STATUS_SUBMIT.error && (
-        <SubmitStatusTest>
-          <StatusText>Odeslání se nezdařilo</StatusText>
-        </SubmitStatusTest>
-      )}
-    </SubmitButtonContainer>
-  )
-}
-
 export const VoteSabatProposal: React.FunctionComponent = () => {
-  const [status, setStatus] = React.useState(STATUS.loading)
-  const [statusSubmit, setStatusSubmit] = React.useState(STATUS_SUBMIT.default)
+  const [statusData, setStatusData] = React.useState(STATUS.loading)
+  const [statusSubmit, setStatusSubmit] = React.useState(STATUS.default)
   const [votes, setVotes] = React.useState(210)
   const [proposals, setProposals] = React.useState<Array<any>>([])
   const {identity} = useIdentity()
@@ -88,7 +33,7 @@ export const VoteSabatProposal: React.FunctionComponent = () => {
       .then((state: any) => {
         if (state !== null) {
           setVotes(state.votes)
-          setStatusSubmit(STATUS_SUBMIT.alreadySent)
+          setStatusSubmit(STATUS.done)
           return state.proposals
         } else {
           return fetchProposals(SELECTED_SABAT_ID, identity.token)
@@ -96,19 +41,19 @@ export const VoteSabatProposal: React.FunctionComponent = () => {
       })
       .then((proposals) => {
         setProposals([...proposals])
-        setStatus(STATUS.done)
+        setStatusData(STATUS.done)
       })
       .catch(error => {
         console.log(error)
-        setStatus(STATUS.error)
+        setStatusData(STATUS.error)
       })
   }, [])
 
   return (
     <Container>
-      {status === STATUS.loading && <StatusText>načítám...</StatusText>}
-      {status === STATUS.error && <StatusText>načítání se nezdařilo</StatusText>}
-      {status === STATUS.done &&
+      {statusData === STATUS.loading && <StatusText>načítám...</StatusText>}
+      {statusData === STATUS.error && <StatusText>načítání se nezdařilo</StatusText>}
+      {statusData === STATUS.done &&
       <>
         <StatusText>Zbývajících hlasů: {votes}</StatusText>
           <FlatList
@@ -131,7 +76,7 @@ export const VoteSabatProposal: React.FunctionComponent = () => {
           <SubmitButton
             status={statusSubmit}
             onPress={() => {
-              setStatusSubmit(STATUS_SUBMIT.sending)
+              setStatusSubmit(STATUS.loading)
               sendProposalVotes(identity.memberNumber, identity.token, proposals)
                 .then(() => {
                   return storageSet(`${identity.memberNumber}:sabat:${SELECTED_SABAT_ID}`, {
@@ -139,9 +84,9 @@ export const VoteSabatProposal: React.FunctionComponent = () => {
                     proposals
                   })
                 })
-                .then(() => setStatusSubmit(STATUS_SUBMIT.alreadySent))
+                .then(() => setStatusSubmit(STATUS.done))
                 .catch(error => {
-                  setStatusSubmit(STATUS_SUBMIT.error)
+                  setStatusSubmit(STATUS.error)
                   console.log('error', error)
                 })
             }}
