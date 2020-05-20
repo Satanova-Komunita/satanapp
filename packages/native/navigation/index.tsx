@@ -1,13 +1,14 @@
 import * as React from 'react'
 import {NavigationContainer} from '@react-navigation/native'
 import {createStackNavigator} from '@react-navigation/stack'
-import {LoginScreen, HomeScreen, VoteSabatProposal} from '../screens'
+import {LoginScreen, HomeScreen, VoteSabatProposal, SettingsScreen} from '../screens'
 import {useIdentity} from '../context'
 
 export type RootStackParamList = {
   Login: undefined,
   Home: undefined,
-  VoteSabatProposal: undefined
+  VoteSabatProposal: undefined,
+  Settings: undefined
 }
 
 const Stack = createStackNavigator<RootStackParamList>()
@@ -29,6 +30,9 @@ export const Navigation: React.FunctionComponent = () => {
             }}/>
             <Stack.Screen name={'VoteSabatProposal'} component={VoteSabatProposal} options={{
               title: 'Volba sabatního návrhu'
+            }}/>
+            <Stack.Screen name={'Settings'} component={SettingsScreen} options={{
+              title: 'Nastavení'
             }}/>
           </>
         ):(

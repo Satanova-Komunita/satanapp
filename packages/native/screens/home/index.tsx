@@ -17,6 +17,9 @@ export const HomeScreen: React.FunctionComponent<Props> = ({navigation}) => {
         <Button label='Sabatní hlasování' onPress={() => navigation.navigate('VoteSabatProposal')}/>
       </Row>
       <Row>
+        <Button label='Nastavení' onPress={() => navigation.navigate('Settings')}/>
+      </Row>
+      <Row>
         <Button label='Odhlásit' onPress={() => resetIdentity()}/>
       </Row>
     </Container>

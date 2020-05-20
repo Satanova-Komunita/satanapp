@@ -15,4 +15,7 @@ export const storageSet = (key: string, value: object) => {
 
 export const removeItem = (key: string) => AsyncStorage.removeItem(key)
 
-export const storageClear = () => AsyncStorage.clear()
+export const storageClear = () => AsyncStorage
+  .getAllKeys()
+  .then((keys) => keys.filter((key) => key !== 'identity:last'))
+  .then((keys) => AsyncStorage.multiRemove(keys))
