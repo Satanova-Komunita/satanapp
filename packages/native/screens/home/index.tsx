@@ -9,7 +9,7 @@ interface Props {
 }
 
 export const HomeScreen: React.FunctionComponent<Props> = ({navigation}) => {
-  const {resetIdentity} = useIdentity()
+  const {signOut} = useIdentity()
 
   return (
     <Container>
@@ -20,7 +20,7 @@ export const HomeScreen: React.FunctionComponent<Props> = ({navigation}) => {
         <Button label='Nastavení' onPress={() => navigation.navigate('Settings')}/>
       </Row>
       <Row>
-        <Button label='Odhlásit' onPress={() => resetIdentity()}/>
+        <Button label='Odhlásit' onPress={() => signOut()}/>
       </Row>
     </Container>
   )

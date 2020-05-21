@@ -48,7 +48,7 @@ const parseResponse = (response: any) => ({
 export const LoginScreen: React.FunctionComponent = () => {
   const [id, setId] = React.useState('')
   const [hasError, setError] = React.useState(false)
-  const {setIdentity} = useIdentity()
+  const {signIn} = useIdentity()
 
   return (
     <Container>
@@ -75,7 +75,7 @@ export const LoginScreen: React.FunctionComponent = () => {
               }
             }).then(response => validateResponse(response))
               .then(response => parseResponse(response))
-              .then(response => setIdentity(response.token, response.memberNumber))
+              .then(response => signIn(response.token, response.memberNumber))
               .catch((error) => {
                 console.error(error)
                 setError(true)
