@@ -2,13 +2,13 @@ import * as React from 'react'
 import {storageSet, removeItem} from '../lib'
 import {useControlIdentity, EMPTY_IDENTITY} from './use-control-identity'
 import {restoreIdentity} from './restore-identity'
-import {UserIdentity} from './types'
+import {Member} from '../types'
 
 const STORAGE_KEY = 'identity:last'
 
 const IdentityContext = React.createContext({
   identity: EMPTY_IDENTITY,
-  signIn: (identity: UserIdentity) => {},
+  signIn: (identity: Member) => {},
   signOut: () => {}
 })
 
@@ -19,14 +19,14 @@ const IdentityProvider: React.FunctionComponent = ({children}) => {
 
   React.useEffect(() => {
     restoreIdentity(STORAGE_KEY)
-      .then(({token, memberNumber}) => setIdentity({token, memberNumber}))
+      .then((identity) => setIdentity(identity))
       .catch(() => resetIdentity())
   }, [])
 
   return (
     <IdentityContext.Provider value={{
       identity,
-      signIn: (identity: UserIdentity) => {
+      signIn: (identity: Member) => {
         return storageSet(STORAGE_KEY, identity).then(() => setIdentity(identity))
       },
       signOut: () => removeItem(STORAGE_KEY).then(() => resetIdentity())

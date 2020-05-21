@@ -1,26 +1,25 @@
 import * as React from 'react'
-import {UserIdentity} from './types'
+import {Member} from '../types'
 
-interface Identity extends UserIdentity {
+interface Identity extends Member {
   status: 'INITIALIZING'|'SIGNED_OUT'|'SIGNED_IN'
 }
 
 export const EMPTY_IDENTITY: Identity = {
   token: '',
-  memberNumber: 0,
+  number: 0,
   status: 'INITIALIZING'
 }
 
 type Action =
-  | {type: 'SET_IDENTITY', payload: UserIdentity}
+  | {type: 'SET_IDENTITY', payload: Member}
   | {type: 'RESET_IDENTITY'}
 
 const reducer = (state: Identity, action: Action): Identity => {
   switch (action.type) {
     case 'SET_IDENTITY':
       return {
-        token: action.payload.token,
-        memberNumber: action.payload.memberNumber,
+        ...action.payload,
         status: 'SIGNED_IN'
       }
     case 'RESET_IDENTITY':
@@ -33,7 +32,7 @@ const reducer = (state: Identity, action: Action): Identity => {
 
 export const useControlIdentity = () => {
   const [identity, dispatch] = React.useReducer(reducer, EMPTY_IDENTITY)
-  const setIdentity = (payload: UserIdentity) => dispatch({type: 'SET_IDENTITY', payload})
+  const setIdentity = (payload: Member) => dispatch({type: 'SET_IDENTITY', payload})
   const resetIdentity = () => dispatch({type: 'RESET_IDENTITY'})
 
   return {

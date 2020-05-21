@@ -29,7 +29,7 @@ export const VoteSabatProposal: React.FunctionComponent = () => {
   const {identity} = useIdentity()
 
   React.useEffect(() => {
-    storageGet(`${identity.memberNumber}:sabat:${SELECTED_SABAT_ID}`)
+    storageGet(`${identity.number}:sabat:${SELECTED_SABAT_ID}`)
       .then((state: any) => {
         if (state !== null) {
           setVotes(state.votes)
@@ -77,9 +77,9 @@ export const VoteSabatProposal: React.FunctionComponent = () => {
             status={statusSubmit}
             onPress={() => {
               setStatusSubmit(STATUS.loading)
-              sendProposalVotes(identity.memberNumber, identity.token, proposals)
+              sendProposalVotes(identity.number, identity.token, proposals)
                 .then(() => {
-                  return storageSet(`${identity.memberNumber}:sabat:${SELECTED_SABAT_ID}`, {
+                  return storageSet(`${identity.number}:sabat:${SELECTED_SABAT_ID}`, {
                     votes,
                     proposals
                   })

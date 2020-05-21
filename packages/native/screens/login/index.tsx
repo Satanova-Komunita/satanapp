@@ -1,9 +1,12 @@
 import * as React from 'react'
+import {fold} from 'fp-ts/lib/Either'
+import {pipe} from 'fp-ts/lib/pipeable'
 import styled from 'styled-components/native'
 import {Button, Container, Input, Row} from '../../components'
 import {requestPost} from '../../lib'
 import {API} from '../../constants'
 import {useIdentity} from '../../context'
+import {Member} from '../../types'
 
 const Header = styled.Text`
   font-size: 50px;
@@ -17,33 +20,18 @@ const Error = styled.Text`
   text-align: center;
 `
 
-const validateResponse = (response: any) => {
-  if (typeof response !== 'object') {
-    throw new Error('Validation of login failed: response must be an object')
-  }
-  if (typeof response.data !== 'object') {
-    throw new Error('Validation of login failed: property data is missing on response')
-  }
-  if (typeof response.data.JWT !== 'string') {
-    throw new Error('Validation of login failed: property data.JWT is missing on response')
-  }
-  if (typeof response.data.userData !== 'object') {
-    throw new Error('Validation of login failed: property data.userData is missing on response')
-  }
-  if (typeof response.data.userData.member_number === 'undefined') {
-    throw new Error('Validation of login failed: property data.userData.member_number is missing on response')
-  }
-  if (parseInt(response.data.userData.member_number) <= 0) {
-    throw new Error('Validation of login failed: property data.userData.member_number must be an int greater than zero')
-  }
-
-  return response
+const decode = (response: any): Promise<Member> => {
+  return new Promise((resolve, reject) => pipe(
+    Member.decode({
+      token: response?.data?.JWT,
+      number: parseInt(response?.data?.userData?.member_number)
+    }),
+    fold(
+      (errors) => reject(errors),
+      (decoded) => resolve(decoded)
+    )
+  ))
 }
-
-const parseResponse = (response: any): {token: string, memberNumber: number} => ({
-  token: response.data.JWT,
-  memberNumber: parseInt(response.data.userData.member_number)
-})
 
 export const LoginScreen: React.FunctionComponent = () => {
   const [id, setId] = React.useState('')
@@ -74,9 +62,8 @@ export const LoginScreen: React.FunctionComponent = () => {
               payload: {
                 member_number: id
               }
-            }).then(response => validateResponse(response))
-              .then(response => parseResponse(response))
-              .then(response => signIn({token: response.token, memberNumber: response.memberNumber}))
+            }).then(response => decode(response))
+              .then(response => signIn(response))
               .catch((error) => {
                 console.error(error)
                 setError(true)
