@@ -1,8 +1,7 @@
 import * as React from 'react'
+import {UserIdentity} from './types'
 
-export interface Identity {
-  token: string,
-  memberNumber: number,
+interface Identity extends UserIdentity {
   status: 'INITIALIZING'|'SIGNED_OUT'|'SIGNED_IN'
 }
 
@@ -12,13 +11,8 @@ export const EMPTY_IDENTITY: Identity = {
   status: 'INITIALIZING'
 }
 
-type ActionPayload = {
-  token: string,
-  memberNumber: number
-}
-
 type Action =
-  | {type: 'SET_IDENTITY', payload: ActionPayload}
+  | {type: 'SET_IDENTITY', payload: UserIdentity}
   | {type: 'RESET_IDENTITY'}
 
 const reducer = (state: Identity, action: Action): Identity => {
@@ -39,7 +33,7 @@ const reducer = (state: Identity, action: Action): Identity => {
 
 export const useControlIdentity = () => {
   const [identity, dispatch] = React.useReducer(reducer, EMPTY_IDENTITY)
-  const setIdentity = (payload: ActionPayload) => dispatch({type: 'SET_IDENTITY', payload})
+  const setIdentity = (payload: UserIdentity) => dispatch({type: 'SET_IDENTITY', payload})
   const resetIdentity = () => dispatch({type: 'RESET_IDENTITY'})
 
   return {

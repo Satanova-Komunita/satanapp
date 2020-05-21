@@ -40,7 +40,7 @@ const validateResponse = (response: any) => {
   return response
 }
 
-const parseResponse = (response: any) => ({
+const parseResponse = (response: any): {token: string, memberNumber: number} => ({
   token: response.data.JWT,
   memberNumber: parseInt(response.data.userData.member_number)
 })
@@ -70,12 +70,13 @@ export const LoginScreen: React.FunctionComponent = () => {
         <Button
           onPress={() => {
             requestPost({
-              url: API.login, payload: {
+              url: API.login,
+              payload: {
                 member_number: id
               }
             }).then(response => validateResponse(response))
               .then(response => parseResponse(response))
-              .then(response => signIn(response.token, response.memberNumber))
+              .then(response => signIn({token: response.token, memberNumber: response.memberNumber}))
               .catch((error) => {
                 console.error(error)
                 setError(true)
