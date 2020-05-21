@@ -13,15 +13,15 @@ const IdentityContext = React.createContext({
 IdentityContext.displayName = 'IdentityContext'
 
 const IdentityProvider: React.FunctionComponent = ({children}) => {
-  const {identity, signIn, signOut} = useControlIdentity()
+  const {identity, setIdentity, resetIdentity} = useControlIdentity()
 
   React.useEffect(() => {
     storageGet(STORAGE_KEY)
       .then((result: any) => {
         if (!result) {
-          return signOut
+          return resetIdentity()
         }
-        return  signIn({token: result.token, memberNumber: result.memberNumber})
+        return  setIdentity({token: result.token, memberNumber: result.memberNumber})
       })
       .catch((error) => console.error('Error while initializing identity', error))
   }, [])
@@ -30,9 +30,9 @@ const IdentityProvider: React.FunctionComponent = ({children}) => {
     <IdentityContext.Provider value={{
       identity,
       signIn: (token: string, memberNumber: number) => {
-        return storageSet(STORAGE_KEY, {token, memberNumber}).then(() => signIn({token, memberNumber}))
+        return storageSet(STORAGE_KEY, {token, memberNumber}).then(() => setIdentity({token, memberNumber}))
       },
-      signOut: () => removeItem(STORAGE_KEY).then(() => signOut())
+      signOut: () => removeItem(STORAGE_KEY).then(() => resetIdentity())
     }}>
       {children}
     </IdentityContext.Provider>

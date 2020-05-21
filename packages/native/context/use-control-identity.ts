@@ -18,18 +18,18 @@ type ActionPayload = {
 }
 
 type Action =
-  | {type: 'SIGN_IN', payload: ActionPayload}
-  | {type: 'SIGN_OUT'}
+  | {type: 'SET_IDENTITY', payload: ActionPayload}
+  | {type: 'RESET_IDENTITY'}
 
 const reducer = (state: Identity, action: Action): Identity => {
   switch (action.type) {
-    case 'SIGN_IN':
+    case 'SET_IDENTITY':
       return {
         token: action.payload.token,
         memberNumber: action.payload.memberNumber,
         status: 'SIGNED_IN'
       }
-    case 'SIGN_OUT':
+    case 'RESET_IDENTITY':
       return {
         ...EMPTY_IDENTITY,
         status: 'SIGNED_OUT'
@@ -39,12 +39,12 @@ const reducer = (state: Identity, action: Action): Identity => {
 
 export const useControlIdentity = () => {
   const [identity, dispatch] = React.useReducer(reducer, EMPTY_IDENTITY)
-  const signIn = (payload: ActionPayload) => dispatch({type: 'SIGN_IN', payload})
-  const signOut = () => dispatch({type: 'SIGN_OUT'})
+  const setIdentity = (payload: ActionPayload) => dispatch({type: 'SET_IDENTITY', payload})
+  const resetIdentity = () => dispatch({type: 'RESET_IDENTITY'})
 
   return {
     identity,
-    signIn,
-    signOut
+    setIdentity,
+    resetIdentity
   }
 }
