@@ -20,73 +20,149 @@ const StatusText = styled.Text`
   margin: 10px;
 `
 
+interface State {
+  statusData: any,
+  statusSubmit: any,
+  votes: number,
+  proposals: Proposals
+}
+
+type LoadProposalsPayload = {
+  statusSubmit?: any,
+  votes?: number,
+  proposals: Proposals
+}
+
+type VotePayload = {
+  votes: number,
+  votedProposalId: any,
+  votedProposalValue: number
+}
+
+type Action =
+  | {type: 'LOAD_PROPOSALS', payload: LoadProposalsPayload}
+  | {type: 'LOAD_PROPOSALS_FAILED'}
+  | {type: 'VOTE', payload: VotePayload}
+  | {type: 'SUBMIT_VOTES'}
+  | {type: 'SUBMIT_VOTES_DONE'}
+  | {type: 'SUBMIT_VOTES_FAILED'}
+
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case 'LOAD_PROPOSALS':
+      return {
+        ...state,
+        ...action.payload,
+        statusData: STATUS.done
+      }
+    case 'LOAD_PROPOSALS_FAILED':
+      return {
+        ...state,
+        statusData: STATUS.error
+      }
+    case 'VOTE':
+      return {
+        statusData: state.statusData,
+        statusSubmit: state.statusSubmit,
+        votes: action.payload.votes,
+        proposals: state.proposals.map((proposal) => {
+          return (proposal.id !== action.payload.votedProposalId) ? proposal : {
+            ...proposal,
+            value: action.payload.votedProposalValue
+          }
+        })
+      }
+    case 'SUBMIT_VOTES':
+      return {
+        ...state,
+        statusSubmit: STATUS.loading
+      }
+    case 'SUBMIT_VOTES_DONE':
+      return {
+        ...state,
+        statusSubmit: STATUS.done
+      }
+    case 'SUBMIT_VOTES_FAILED':
+      return {
+        ...state,
+        statusSubmit: STATUS.error
+      }
+  }
+}
+
+const initProposals = async (memberNumber: number, token: string): Promise<LoadProposalsPayload> => {
+  const data: any = await storageGet(`${memberNumber}:sabat:${SELECTED_SABAT_ID}`)
+  if (data !== null) {
+    return {
+      votes: data.votes,
+      proposals: data.proposals,
+      statusSubmit: STATUS.done
+    }
+  }
+
+  const proposals = await fetchProposals(SELECTED_SABAT_ID, token)
+  return {
+    proposals: proposals
+  }
+}
+
 const SELECTED_SABAT_ID = 1
 
 export const VoteSabatProposal: React.FunctionComponent = () => {
-  const [statusData, setStatusData] = React.useState(STATUS.loading)
-  const [statusSubmit, setStatusSubmit] = React.useState(STATUS.default)
-  const [votes, setVotes] = React.useState(210)
-  const [proposals, setProposals] = React.useState<Proposals>([])
   const {identity} = useIdentity()
+  const [state, dispatch] = React.useReducer(reducer, {
+    statusData: STATUS.loading,
+    statusSubmit: STATUS.default,
+    votes: 210,
+    proposals: []
+  })
 
   React.useEffect(() => {
-    storageGet(`${identity.number}:sabat:${SELECTED_SABAT_ID}`)
-      .then((state: any) => {
-        if (state !== null) {
-          setVotes(state.votes)
-          setStatusSubmit(STATUS.done)
-          return state.proposals
-        } else {
-          return fetchProposals(SELECTED_SABAT_ID, identity.token)
-        }
-      })
-      .then((proposals) => {
-        setProposals([...proposals])
-        setStatusData(STATUS.done)
-      })
-      .catch(error => {
+    initProposals(identity.number, identity.token)
+      .then((data) => dispatch({type: 'LOAD_PROPOSALS', payload: data}))
+      .catch((error) => {
         console.log(error)
-        setStatusData(STATUS.error)
-      })
+        dispatch({type: 'LOAD_PROPOSALS_FAILED'})
+    })
   }, [])
 
   return (
     <Container>
-      {statusData === STATUS.loading && <StatusText>načítám...</StatusText>}
-      {statusData === STATUS.error && <StatusText>načítání se nezdařilo</StatusText>}
-      {statusData === STATUS.done &&
+      {state.statusData === STATUS.loading && <StatusText>načítám...</StatusText>}
+      {state.statusData === STATUS.error && <StatusText>načítání se nezdařilo</StatusText>}
+      {state.statusData === STATUS.done &&
       <>
-        <StatusText>Zbývajících hlasů: {votes}</StatusText>
+        <StatusText>Zbývajících hlasů: {state.votes}</StatusText>
           <FlatList<Proposal>
-            data={proposals}
+            data={state.proposals}
             renderItem={({item}) => <QuadraticVotingButton
                 key={item.id}
-                votes={votes}
+                votes={state.votes}
                 value={item.value}
                 name={item.name}
                 handleOnChange={({newVotes, newProposalValue}: any) => {
-                  setVotes(newVotes)
-                  setProposals(proposals.map(newProposal => newProposal.id !== item.id ? newProposal : ({
-                    ...newProposal,
-                    value: newProposalValue
-                  })))
+                  dispatch({type: 'VOTE', payload: {
+                    votes: newVotes,
+                    votedProposalId: item.id,
+                    votedProposalValue: newProposalValue
+                  }})
                 }}
               />
             }
           />
           <SubmitButton
-            status={statusSubmit}
+            status={state.statusSubmit}
             onPress={() => {
-              setStatusSubmit(STATUS.loading)
-              sendProposalVotes(identity.number, identity.token, proposals)
+              dispatch({type: 'SUBMIT_VOTES'})
+              sendProposalVotes(identity.number, identity.token, state.proposals)
                 .then(() => storageSet(`${identity.number}:sabat:${SELECTED_SABAT_ID}`, {
-                  votes,
-                  proposals
+                  votes: state.votes,
+                  proposals: state.proposals
                 }))
-                .then(() => setStatusSubmit(STATUS.done))
+                .then(() => dispatch({type: 'SUBMIT_VOTES_DONE'}))
                 .catch(error => {
-                  setStatusSubmit(STATUS.error)
                   console.log('error', error)
+                  dispatch({type: 'SUBMIT_VOTES_FAILED'})
                 })
             }}
           />
