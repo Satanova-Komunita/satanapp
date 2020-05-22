@@ -79,12 +79,10 @@ export const VoteSabatProposal: React.FunctionComponent = () => {
             onPress={() => {
               setStatusSubmit(STATUS.loading)
               sendProposalVotes(identity.number, identity.token, proposals)
-                .then(() => {
-                  return storageSet(`${identity.number}:sabat:${SELECTED_SABAT_ID}`, {
-                    votes,
-                    proposals
-                  })
-                })
+                .then(() => storageSet(`${identity.number}:sabat:${SELECTED_SABAT_ID}`, {
+                  votes,
+                  proposals
+                }))
                 .then(() => setStatusSubmit(STATUS.done))
                 .catch(error => {
                   setStatusSubmit(STATUS.error)
