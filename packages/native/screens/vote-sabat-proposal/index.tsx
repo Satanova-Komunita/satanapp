@@ -8,6 +8,7 @@ import {SubmitButton} from './submit-button'
 import {fetchProposals, sendProposalVotes} from './requests'
 import {STATUS} from './constants'
 import {Proposal, Proposals} from '../../types'
+import {Either, left, right, fold} from 'fp-ts/lib/Either'
 
 const Container = styled.View`
   flex: 1;
@@ -27,9 +28,12 @@ interface State {
   proposals: Proposals
 }
 
-type LoadProposalsPayload = {
-  statusSubmit?: any,
-  votes?: number,
+type LoadProposalsFromCache = {
+  votes: number,
+  proposals: Proposals
+}
+
+type LoadProposalsFromNetwork = {
   proposals: Proposals
 }
 
@@ -40,20 +44,28 @@ type VotePayload = {
 }
 
 type Action =
-  | {type: 'LOAD_PROPOSALS', payload: LoadProposalsPayload}
-  | {type: 'LOAD_PROPOSALS_FAILED'}
-  | {type: 'VOTE', payload: VotePayload}
-  | {type: 'SUBMIT_VOTES'}
-  | {type: 'SUBMIT_VOTES_DONE'}
-  | {type: 'SUBMIT_VOTES_FAILED'}
+  | { type: 'LOAD_PROPOSALS_FROM_CACHE', payload: LoadProposalsFromCache }
+  | { type: 'LOAD_PROPOSALS_FROM_NETWORK', payload: LoadProposalsFromNetwork }
+  | { type: 'LOAD_PROPOSALS_FAILED' }
+  | { type: 'VOTE', payload: VotePayload }
+  | { type: 'SUBMIT_VOTES' }
+  | { type: 'SUBMIT_VOTES_DONE' }
+  | { type: 'SUBMIT_VOTES_FAILED' }
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case 'LOAD_PROPOSALS':
+    case 'LOAD_PROPOSALS_FROM_CACHE':
       return {
-        ...state,
         ...action.payload,
+        statusSubmit: STATUS.done,
         statusData: STATUS.done
+      }
+    case 'LOAD_PROPOSALS_FROM_NETWORK':
+      return {
+        ...action.payload,
+        votes: state.votes,
+        statusData: STATUS.done,
+        statusSubmit: state.statusSubmit
       }
     case 'LOAD_PROPOSALS_FAILED':
       return {
@@ -90,23 +102,22 @@ const reducer = (state: State, action: Action): State => {
   }
 }
 
-const initProposals = async (memberNumber: number, token: string): Promise<LoadProposalsPayload> => {
+const SELECTED_SABAT_ID = 1
+
+const initProposals = async (memberNumber: number, token: string): Promise<Either<LoadProposalsFromCache, LoadProposalsFromNetwork>> => {
   const data: any = await storageGet(`${memberNumber}:sabat:${SELECTED_SABAT_ID}`)
   if (data !== null) {
-    return {
+    return left({
       votes: data.votes,
-      proposals: data.proposals,
-      statusSubmit: STATUS.done
-    }
+      proposals: data.proposals
+    })
   }
 
   const proposals = await fetchProposals(SELECTED_SABAT_ID, token)
-  return {
+  return right({
     proposals: proposals
-  }
+  })
 }
-
-const SELECTED_SABAT_ID = 1
 
 export const VoteSabatProposal: React.FunctionComponent = () => {
   const {identity} = useIdentity()
@@ -119,11 +130,13 @@ export const VoteSabatProposal: React.FunctionComponent = () => {
 
   React.useEffect(() => {
     initProposals(identity.number, identity.token)
-      .then((data) => dispatch({type: 'LOAD_PROPOSALS', payload: data}))
-      .catch((error) => {
+      .then(fold(
+        (payload) => dispatch({type: 'LOAD_PROPOSALS_FROM_CACHE', payload}),
+        (payload) => dispatch({type: 'LOAD_PROPOSALS_FROM_NETWORK', payload})
+      )).catch((error) => {
         console.log(error)
         dispatch({type: 'LOAD_PROPOSALS_FAILED'})
-    })
+      })
   }, [])
 
   return (
@@ -133,39 +146,41 @@ export const VoteSabatProposal: React.FunctionComponent = () => {
       {state.statusData === STATUS.done &&
       <>
         <StatusText>Zbývajících hlasů: {state.votes}</StatusText>
-          <FlatList<Proposal>
-            data={state.proposals}
-            renderItem={({item}) => <QuadraticVotingButton
-                key={item.id}
-                votes={state.votes}
-                value={item.value}
-                name={item.name}
-                handleOnChange={({newVotes, newProposalValue}: any) => {
-                  dispatch({type: 'VOTE', payload: {
-                    votes: newVotes,
-                    votedProposalId: item.id,
-                    votedProposalValue: newProposalValue
-                  }})
-                }}
-              />
-            }
-          />
-          <SubmitButton
-            status={state.statusSubmit}
-            onPress={() => {
-              dispatch({type: 'SUBMIT_VOTES'})
-              sendProposalVotes(identity.number, identity.token, state.proposals)
-                .then(() => storageSet(`${identity.number}:sabat:${SELECTED_SABAT_ID}`, {
-                  votes: state.votes,
-                  proposals: state.proposals
-                }))
-                .then(() => dispatch({type: 'SUBMIT_VOTES_DONE'}))
-                .catch(error => {
-                  console.log('error', error)
-                  dispatch({type: 'SUBMIT_VOTES_FAILED'})
-                })
+        <FlatList<Proposal>
+          data={state.proposals}
+          renderItem={({item}) => <QuadraticVotingButton
+            key={item.id}
+            votes={state.votes}
+            value={item.value}
+            name={item.name}
+            handleOnChange={({newVotes, newProposalValue}: any) => {
+              dispatch({
+                type: 'VOTE', payload: {
+                  votes: newVotes,
+                  votedProposalId: item.id,
+                  votedProposalValue: newProposalValue
+                }
+              })
             }}
           />
+          }
+        />
+        <SubmitButton
+          status={state.statusSubmit}
+          onPress={() => {
+            dispatch({type: 'SUBMIT_VOTES'})
+            sendProposalVotes(identity.number, identity.token, state.proposals)
+              .then(() => storageSet(`${identity.number}:sabat:${SELECTED_SABAT_ID}`, {
+                votes: state.votes,
+                proposals: state.proposals
+              }))
+              .then(() => dispatch({type: 'SUBMIT_VOTES_DONE'}))
+              .catch(error => {
+                console.log('error', error)
+                dispatch({type: 'SUBMIT_VOTES_FAILED'})
+              })
+          }}
+        />
       </>
       }
     </Container>
