@@ -17,10 +17,5 @@ const decode = (data: any): Promise<Member> => {
 }
 
 export const restoreIdentity = (storageKey: string): Promise<Member> => {
-  return new Promise((resolve, reject) => {
-    return storageGet(storageKey)
-      .then((data: any) => decode(data))
-      .then((identity) => resolve(identity))
-      .catch(reject)
-  })
+  return storageGet(storageKey).then((data: any) => decode(data))
 }
