@@ -3,7 +3,7 @@ import {TouchableOpacity, GestureResponderEvent} from 'react-native'
 import styled from 'styled-components/native'
 
 interface Props {
-  text: string,
+  name: string,
   handleOnChange: Function,
   value: number,
   votes: number
@@ -91,13 +91,13 @@ const calculateMinus = (value: number, votes: number) => {
   }
 }
 
-export const QuadraticVotingButton: React.FunctionComponent<Props> = ({text, handleOnChange, value, votes}) => {
+export const QuadraticVotingButton: React.FunctionComponent<Props> = ({name, handleOnChange, value, votes}) => {
   const {newVotesPlus, newProposalValuePlus} = calculatePlus(value, votes)
   const {newVotesMinus, newProposalValueMinus} = calculateMinus(value, votes)
 
   return (
     <Container>
-      <VotingText>{text}</VotingText>
+      <VotingText>{name}</VotingText>
       <StyledVotingStatus>
         <VotingButton
           symbol='+'

@@ -7,6 +7,7 @@ import {QuadraticVotingButton} from './quadratic-voting-button'
 import {SubmitButton} from './submit-button'
 import {fetchProposals, sendProposalVotes} from './requests'
 import {STATUS} from './constants'
+import {Proposal, Proposals} from '../../types'
 
 const Container = styled.View`
   flex: 1;
@@ -25,7 +26,7 @@ export const VoteSabatProposal: React.FunctionComponent = () => {
   const [statusData, setStatusData] = React.useState(STATUS.loading)
   const [statusSubmit, setStatusSubmit] = React.useState(STATUS.default)
   const [votes, setVotes] = React.useState(210)
-  const [proposals, setProposals] = React.useState<Array<any>>([])
+  const [proposals, setProposals] = React.useState<Proposals>([])
   const {identity} = useIdentity()
 
   React.useEffect(() => {
@@ -56,13 +57,13 @@ export const VoteSabatProposal: React.FunctionComponent = () => {
       {statusData === STATUS.done &&
       <>
         <StatusText>Zbývajících hlasů: {votes}</StatusText>
-          <FlatList
+          <FlatList<Proposal>
             data={proposals}
             renderItem={({item}) => <QuadraticVotingButton
                 key={item.id}
                 votes={votes}
                 value={item.value}
-                text={item.text}
+                name={item.name}
                 handleOnChange={({newVotes, newProposalValue}: any) => {
                   setVotes(newVotes)
                   setProposals(proposals.map(newProposal => newProposal.id !== item.id ? newProposal : ({

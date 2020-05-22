@@ -1,28 +1,29 @@
+import {fold} from 'fp-ts/lib/Either'
+import {pipe} from 'fp-ts/lib/pipeable'
 import {requestGet} from '../../../lib'
 import {API} from '../../../constants'
+import {Proposals} from '../../../types'
 
-const validateResponse = (response: any) => {
-  if (typeof response !== 'object') {
-    throw new Error('Response must be an object')
-  }
-
-  if (!Array.isArray(response.data)) {
-    throw new Error('Data must be an array')
-  }
-}
-
-const parseProposals = (data: Array<any>) => data.map(record => ({
-  id: record.ID,
-  text: record.name,
+const extract = (data: any = []) => data.map((record: any) => ({
+  id: record?.ID,
+  name: record?.name,
   value: 0
 }))
 
+const decode = (response: any): Promise<Proposals> => {
+  return new Promise((resolve, reject) => pipe(
+    extract(response?.data),
+    Proposals.decode,
+    fold(
+      (errors) => reject(errors),
+      (votes) => resolve(votes)
+    )
+  ))
+}
+
 export const fetchProposals = async (sabatId: number, token: string) => {
-  const response = await requestGet({
+  return requestGet({
     url: API.sabatsProposals.replace(':id', sabatId.toString()),
     bearerToken: token
-  })
-  validateResponse(response)
-
-  return parseProposals(response.data)
+  }).then((response) => decode(response))
 }
