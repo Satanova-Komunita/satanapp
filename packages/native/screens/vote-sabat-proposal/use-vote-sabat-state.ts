@@ -83,10 +83,8 @@ const reducer = (state: State, action: Action): State => {
   }
 }
 
-type Reducer<S, A> = (state: S, action: A) => S
-
 export const useVoteSabatState = () => {
-  const [currentState, dispatch] = React.useReducer<Reducer<State, Action>>(reducer, {
+  const [currentState, dispatch] = React.useReducer(reducer, {
     statusData: STATUS.loading,
     statusSubmit: STATUS.default,
     votes: 210,
