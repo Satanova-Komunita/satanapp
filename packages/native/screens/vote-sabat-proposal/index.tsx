@@ -79,7 +79,7 @@ export const VoteSabatProposal: React.FunctionComponent = () => {
             votes={state.votes}
             value={item.value}
             name={item.name}
-            handleOnChange={({newVotes, newProposalValue}: any) => {
+            handleOnChange={({newVotes, newProposalValue}) => {
               vote({
                 votes: newVotes,
                 votedProposalId: item.id,

@@ -20,7 +20,7 @@ export type LoadProposalsFromNetwork = {
 
 type VotePayload = {
   votes: number,
-  votedProposalId: any,
+  votedProposalId: string,
   votedProposalValue: number
 }
 

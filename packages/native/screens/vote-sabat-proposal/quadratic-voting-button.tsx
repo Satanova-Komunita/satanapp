@@ -4,7 +4,7 @@ import styled from 'styled-components/native'
 
 interface Props {
   name: string,
-  handleOnChange: Function,
+  handleOnChange: (result: {newVotes: number, newProposalValue: number}) => void,
   value: number,
   votes: number
 }

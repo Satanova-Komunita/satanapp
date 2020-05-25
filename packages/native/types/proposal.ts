@@ -1,7 +1,18 @@
 import * as t from 'io-ts'
 
+const NumericID = new t.Type(
+  'NumericID',
+  t.string.is,
+  (i: any, c) => {
+    const typeOfI = typeof i
+    const isNumberOString = typeOfI === 'number' || typeOfI === 'string'
+    return (isNumberOString && !isNaN(i))  ? t.success(i.toString()) : t.failure(i, c)
+  },
+  String
+)
+
 const Proposal = t.type({
-  id: t.string,
+  id: NumericID,
   name: t.string,
   value: t.number
 }, 'Proposal')
