@@ -1,12 +1,7 @@
 import {AsyncStorage} from 'react-native'
 
-export const storageGet = async <A=object>(key: string): Promise<A|null> => {
-  const value = await AsyncStorage.getItem(key)
-
-  if (value !== null) {
-    return JSON.parse(value)
-  }
-  return value
+export const storageGet = <A=object>(key: string): Promise<A|null> => {
+  return AsyncStorage.getItem(key).then((value) => JSON.parse(String(value)))
 }
 
 export const storageSet = (key: string, value: object) => {
